@@ -1,0 +1,24 @@
+image: debian:12-5.slim
+
+stages:
+  - generate
+
+clic_tests_and_signatures:
+  image: debian:12.5-slim
+  stage: generate 
+  variables:
+    RISCV_TOOLCHAIN_URI: 
+      https://github.com/zephyrproject-rtos/sdk-ng/releases/download/v0.16.8/toolchain_linux-x86_64_riscv64-zephyr-elf.tar.xz
+  script:
+    - apt-get update
+    - apt-get install -qqy wget xz-utils
+    # Get Zephyr toolchain
+    - wget ${RISCV_TOOLCHAIN_URI} -O toolchain.tar.xz
+    - tar -xf toolchain.tar.xz
+    - export PATH=$PATH:`pwd`/riscv64-zephyr-elf/bin
+    # Build the binaries
+    - ./build.sh
+    - mv bin/ artifacts/
+  artifacts:
+    paths:
+      - artifacts/
